@@ -101,8 +101,9 @@ public class ChatConnection{
 
             DBUser user = await getUser(login);
 
+            bool passwordsMatch = BCrypt.Net.BCrypt.Verify(Password, user.password);
 
-            if (Password!=user.password) return "error";
+            if (!passwordsMatch) return "error";
             this.userId = user.id;
             this.userName = user.name;
             isAuth = true;
@@ -121,7 +122,9 @@ public class ChatConnection{
             string criptedPassword = regData.criptedPassword!;
             string password = decodeText(criptedPassword,secretRSAkey.num,secretRSAkey.mod);
 
-            await addUser(regData.login!,regData.name!,password);
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+            await addUser(regData.login!,regData.name!,hashedPassword);
             DBUser user = await getUser(regData.login!);
 
             this.userId = user.id;

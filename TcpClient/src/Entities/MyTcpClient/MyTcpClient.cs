@@ -61,11 +61,7 @@ public class MyTcpClient
         await realSocket.SendAsync(bufferMessage);
         };
 
-        try{
-            await action();
-        }catch{
-            Console.WriteLine("ошибка при отправке сообщения");
-        }
+        await action();
     }
     void privatOnMessage(string message){
         ConnectionMessage? serverMessage = 
@@ -104,12 +100,8 @@ public class MyTcpClient
             onConnect?.Invoke();
         };
 
-        try{
-            action().Wait();
-            waitMessages();
-        }catch{
-            Console.WriteLine("Ошибка при подключении к серверу");
-        }
+        action().Wait();
+        waitMessages();
     }
     async void waitMessages(){
         while(true){

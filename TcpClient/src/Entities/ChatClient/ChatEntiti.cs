@@ -31,7 +31,7 @@ public class ChatEntiti {
             netClient.connect(url,port);
             getKeyFromServer();
         }catch{
-            onTryConnect?.Invoke(Status.succes);
+            onTryConnect?.Invoke(Status.error);
         }
     }
     public void getKeyFromServer(){

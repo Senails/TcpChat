@@ -5,7 +5,7 @@ public class MyChat{
     public List<ChatConnection> ConnectionList = new List<ChatConnection>();
 
     public MyChat(){
-        MyDataBase.connect("src/Entities/DataBase/sqlLite.db");
+        MyDataBase.connect("sqlLite.db");
     }
     public void start(int port){
         server.onConnection += (MyTcpSocket clientSocket)=>{
@@ -17,8 +17,13 @@ public class MyChat{
 
             ConnectionList.Add(chatConnection);
         };
+        server.onClose += ()=>{
+            Console.WriteLine("сервер чатика перестал работать");
+        };
 
-        server.listen(port);
+        server.listen(port, ()=>{
+            Console.WriteLine("сервер чатика запустился");
+        });
     }
     void sendMessageEnyone(Message messageObject){
         var actionList = ConnectionList

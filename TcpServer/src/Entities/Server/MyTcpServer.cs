@@ -18,12 +18,13 @@ public class MyTcpServer
         realSocket.Close();
         onClose?.Invoke();;
     }
-    public void listen(int port){
+    public void listen(int port, Action? onStart = null){
         AsyncAction action = async ()=>{
             IPEndPoint ipPoint = new IPEndPoint(IPAddress.Any, port);
             realSocket.Bind(ipPoint);
             realSocket.Listen();
 
+            if (onStart!=null) onStart();
             while (true){
                 if(isClosed) return;
 
