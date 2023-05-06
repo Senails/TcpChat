@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
+﻿using MyTypes;
+using static AsyncLib;
 
-using MyTypes;
-
-var dontClose = AsyncLib.dontCloseProcces();
+var dontClose = dontCloseProcces();
 
 
 ChatEntiti client = new ChatEntiti();
@@ -18,6 +17,19 @@ client.onTryConnect += (Status status)=>{
                 client.onOpenChat+=(Status status)=>{
                     if (status==Status.succes){
                         Console.WriteLine("предыдущие сообщения получены");
+
+                        client.onNewMessage += (dbMess)=>{
+                            if (dbMess.id<0){
+                                Console.WriteLine(dbMess.text);
+                                return;
+                            }
+
+                            Console.WriteLine($"{dbMess.authtor} : {dbMess.text}");
+                        };
+
+
+
+
                     }else{
                         Console.WriteLine("предыдущие сообщения не получены");
                     }
@@ -37,8 +49,9 @@ client.onTryConnect += (Status status)=>{
 
 client.Connect("localhost",4000);
 
-
-
+setTimeout(()=>{
+    client.sendMessage("сообщение в чатик");
+},3000);
 
 
 

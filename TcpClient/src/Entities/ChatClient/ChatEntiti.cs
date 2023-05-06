@@ -14,7 +14,7 @@ public class ChatEntiti {
     public event Action<Status>? onTryAuth;
     public event Action<Status>? onOpenChat;
 
-    public event Action<string>? onNewMessage;
+    public event Action<DBMessage>? onNewMessage;
     public event Action<string>? onUserEnterInChat;
     public event Action<string>? onUserLeaveFromChat;
     public event Action? onCloseConnection;
@@ -151,10 +151,51 @@ public class ChatEntiti {
                 break;
         }
     }
+    void newMessageHandler(string data){
+        DBMessage dbMessage = JsonSerializer.Deserialize<DBMessage>(data)!;
+        MessagesList.Add(dbMessage);
+        onNewMessage?.Invoke(dbMessage);
+    }
+    void openChatHandler(string data){
+        UsersList.Add(data);
+        onUserLeaveFromChat?.Invoke(data);
 
-    void newMessageHandler(string data){}
-    void openChatHandler(string data){}
-    void leaveFromChatHandler(string data){}
+        DBMessage dbMessage = new DBMessage{
+            id = -100,
+            date = 0,
+            authtor = "",
+            text = $"{data} вошел в чатик"
+        };
+
+        MessagesList.Add(dbMessage);
+        onNewMessage?.Invoke(dbMessage);
+    }
+    void leaveFromChatHandler(string data){
+        UsersList.Remove(data);
+        onUserLeaveFromChat?.Invoke(data);
+
+        DBMessage dbMessage = new DBMessage{
+            id = -100,
+            date = 0,
+            authtor = "",
+            text = $"{data} вышел из чатика"
+        };
+
+        MessagesList.Add(dbMessage);
+        onNewMessage?.Invoke(dbMessage);
+    }
+
+
+    public void sendMessage(string dataMes){
+        Message mess = new Message{
+            typeMessage = messageType.iSendMessage,
+            data = dataMes,
+        };
+
+        string json = JsonSerializer.Serialize<Message>(mess);
+
+        netClient!.sendMessage(json);
+    }
 
     void closeHandler(){
         onCloseConnection?.Invoke();
