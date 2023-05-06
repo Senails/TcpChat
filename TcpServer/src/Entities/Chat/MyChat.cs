@@ -1,14 +1,14 @@
 using MyTypes;
 
 public class MyChat{
-    MyServer server = new MyServer();
+    MyTcpServer server = new MyTcpServer();
     public List<ChatConnection> ConnectionList = new List<ChatConnection>();
 
     public MyChat(){
         MyDataBase.connect("src/Entities/DataBase/sqlLite.db");
     }
     public void start(int port){
-        server.onConnection += (MySocket clientSocket)=>{
+        server.onConnection += (MyTcpSocket clientSocket)=>{
             ChatConnection chatConnection = 
             new ChatConnection(clientSocket,this) {
                 onWantToSendMessage = sendMessageEnyone,

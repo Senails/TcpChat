@@ -19,13 +19,13 @@ public class ChatConnection{
     KeyRSA? secretRSAkey;
 
 
-    MySocket clientSocket;
+    MyTcpSocket clientSocket;
     MyChat chatObject;
     public Action<Message>? onWantToSendMessage;
     public Action<ChatConnection>? onLeave;
 
 
-    public ChatConnection(MySocket clientSocket, MyChat chatObject){
+    public ChatConnection(MyTcpSocket clientSocket, MyChat chatObject){
         this.chatObject=chatObject;
         this.clientSocket=clientSocket;
 
@@ -135,10 +135,11 @@ public class ChatConnection{
     }
     async Task<string> getPrevInfo(){
         try{
-            string[] userNames = chatObject.ConnectionList
-            .Select((connection)=>connection.userName).ToArray()!;
-
             DBMessage[] prevMessages = await getMessages();
+
+            string[] userNames = chatObject.ConnectionList
+            .Where((connection)=>connection.isAuth && connection.isOpen)
+            .Select((connection)=>connection.userName).ToArray()!;
 
             PrevInfo previnfo = new PrevInfo{
                 userNames = userNames,

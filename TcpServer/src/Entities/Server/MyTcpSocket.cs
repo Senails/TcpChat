@@ -5,14 +5,14 @@ using System.Text.Json;
 using static MyDateLib;
 using static AsyncLib;
 
-public class MySocket
+public class MyTcpSocket
 {
     public Socket realSocket;
     public event Action<string>? onMessage;
     public event Action<string,Action<string>>? onRequest;
     public event Action? onClose;
 
-    public MySocket(Socket socket){
+    public MyTcpSocket(Socket socket){
         realSocket = socket;
     }
     public async Task sendMessage(string message){

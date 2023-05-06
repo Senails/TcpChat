@@ -3,14 +3,14 @@ using System.Net.Sockets;
 
 using static AsyncLib;
 
-public class MyServer 
+public class MyTcpServer 
 {
     bool isClosed = false;
     Socket realSocket;
     public event Action? onClose;
-    public event Action<MySocket>? onConnection;
+    public event Action<MyTcpSocket>? onConnection;
 
-    public MyServer(){
+    public MyTcpServer(){
         realSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
     public void Close(){
@@ -29,7 +29,7 @@ public class MyServer
 
                 try {
                     Socket socket = await realSocket.AcceptAsync();
-                    MySocket clientSocket = new MySocket(socket);
+                    MyTcpSocket clientSocket = new MyTcpSocket(socket);
 
                     Task task = Task.Run(()=>{
                         onConnection?.Invoke(clientSocket);

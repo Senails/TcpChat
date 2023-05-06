@@ -5,7 +5,7 @@ using MyTypes;
 var dontClose = AsyncLib.dontCloseProcces();
 
 
-ChatClient client = new ChatClient();
+ChatEntiti client = new ChatEntiti();
 
 client.onTryConnect += (Status status)=>{
     if (status==Status.succes){
@@ -14,12 +14,22 @@ client.onTryConnect += (Status status)=>{
         client.onTryAuth += (Status status)=>{
             if (status==Status.succes){
                 Console.WriteLine("авторизация произошла");
+
+                client.onOpenChat+=(Status status)=>{
+                    if (status==Status.succes){
+                        Console.WriteLine("предыдущие сообщения получены");
+                    }else{
+                        Console.WriteLine("предыдущие сообщения не получены");
+                    }
+                };
+
+                client.enterInChat();
             }else{
                 Console.WriteLine("авторизация не произошла");
             }
         };
 
-        client.Auth("dsfs2d","fsdfdh2fd1");
+        client.Auth("dsf54s32d","fsdf2d34h2fd1");
     }else{
         Console.WriteLine("ошибка при подключени");
     }

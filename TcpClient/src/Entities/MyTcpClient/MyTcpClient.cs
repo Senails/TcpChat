@@ -4,7 +4,7 @@ using System.Text.Json;
 
 using static MyDateLib;
 
-public class MyClient 
+public class MyTcpClient 
 {
     Socket realSocket;
     public event Action<string>? onMessage;
@@ -13,7 +13,7 @@ public class MyClient
     List<MessageWaiter> waitList = new List<MessageWaiter>();
 
 
-    public MyClient(){
+    public MyTcpClient(){
         realSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
