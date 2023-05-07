@@ -1,10 +1,10 @@
 using System;
-using System.Text;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Json;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 using static MyDateLib;
 
@@ -23,55 +23,51 @@ public class MyTcpClient
 
 
     public void sendMessage(string message){
-        ConnectionMessage willJson = 
+        ConnectionMessage willBson = 
         new ConnectionMessage() {
             messageID = getDateMilisec(),
             waitResponse = false,
             data = message
         };
 
-        string messageForServer = JsonSerializer.Serialize<ConnectionMessage>(willJson);
-        privatSendMessage(messageForServer);
+        byte[] messageForServer = willBson.ToBson();
+        internalSendMessage(messageForServer);
     }
     public void sendRequest(string message, Action<string> onResponse){
         long messID = getDateMilisec();
 
-        ConnectionMessage willJson = 
+        ConnectionMessage willBson = 
         new ConnectionMessage() {
             messageID = messID,
             waitResponse = true,
             data = message
         };
 
-        string messageForServer = JsonSerializer.Serialize<ConnectionMessage>(willJson);
+        byte[] messageForServer = willBson.ToBson();
 
         waitList.Add(new MessageWaiter(){
             messageID = messID,
             handler = onResponse
         });
     
-        privatSendMessage(messageForServer);
+        internalSendMessage(messageForServer);
     }
-    void privatSendMessage(string message){
-        Action action = ()=>{
-
-        byte[] bufferMessage = Encoding.UTF8.GetBytes(message);
-
-        Int32 lenght = bufferMessage.Length;
+    public void Close(){
+        realSocket.Close();
+    }
+    
+    
+    void internalSendMessage(byte[] bson){
+        Int32 lenght = bson.Length;
 
         byte[] bufferLenght = BitConverter.GetBytes(lenght);
 
         realSocket.Send(bufferLenght);
-        realSocket.Send(bufferMessage);
-        };
-
-        action();
+        realSocket.Send(bson);
     }
-    void privatOnMessage(string message){
+    void onGetFromServer(byte[] bson){
         ConnectionMessage serverMessage = 
-        JsonSerializer.Deserialize<ConnectionMessage>(message);
-
-        if (serverMessage==null) return;
+        BsonSerializer.Deserialize<ConnectionMessage>(bson);
 
         long messID = serverMessage.messageID;
         string realMessage = serverMessage.data;
@@ -89,12 +85,9 @@ public class MyTcpClient
             onMessage.Invoke(realMessage); 
         }
     }
-
-
-    public void Close(){
-        realSocket.Close();
-    }
-    void privatClose(){
+    
+    
+    void internalClose(){
         realSocket.Close();
         onClose.Invoke();
     }
@@ -113,35 +106,22 @@ public class MyTcpClient
             int count=1000;
             int size = 0;
 
+            byte[] bufferData = new byte[size];
             try{
                 count = realSocket.Receive(bufferLenght);
                 size = BitConverter.ToInt32(bufferLenght, 0);
+
+                count = realSocket.Receive(bufferData);
             }catch{
-                privatClose();
+                internalClose();
                 break;
             }
             if (count == 0) {
-                privatClose();
+                internalClose();
                 break;
             } 
-
-            byte[] bufferData = new byte[size];
-            string message;
-
-            try{
-                count = realSocket.Receive(bufferData);
-                message = Encoding.UTF8.GetString(bufferData, 0, count);
-            }catch{
-                privatClose();
-                break;
-            }
-
-            if (count == 0) {
-                privatClose();
-                break;
-            }
             
-            privatOnMessage(message);  
+            onGetFromServer(bufferData);  
         }
     }
 
@@ -150,7 +130,7 @@ public class MyTcpClient
     record ConnectionMessage(){
         public long messageID { get; init; }
         public bool waitResponse { get; init; }
-        public string data { get; init; } = "";
+        public string data { get; init; } 
     }
     record MessageWaiter(){
         public long messageID { get; init; }

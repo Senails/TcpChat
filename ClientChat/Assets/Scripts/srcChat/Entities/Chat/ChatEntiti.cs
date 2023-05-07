@@ -14,24 +14,19 @@ public class ChatEntiti {
     KeyRSA openkey = null;
     MyTcpClient netClient;
 
-
     public List<string> UsersList= new List<string>();
     public List<DBMessage> MessagesList = new List<DBMessage>();
-    
-
     public event Action<Status> onTryConnect;
     public event Action<Status> onTryAuth;
-    public event Action<Status> onOpenChat;
-
+    public event Action<Status> onEnterInChat;
 
     public event Action<DBMessage> onNewMessage;
     public event Action<string> onUserEnterInChat;
     public event Action<string> onUserLeaveFromChat;
     public event Action onCloseConnection;
 
-
-    public event Action onChangeUsersList;
-    public event Action onChangeMessagesList;
+    // public event Action onChangeUsersList;
+    // public event Action onChangeMessagesList;
 
 
     public void Connect(string url,int port){
@@ -45,7 +40,7 @@ public class ChatEntiti {
             onTryConnect?.Invoke(Status.error);
         }
     }
-    public void getKeyFromServer(){
+    void getKeyFromServer(){
         Message message = new Message{
             typeMessage = messageType.getKeyRequest
         };
@@ -115,7 +110,7 @@ public class ChatEntiti {
             onTryAuth?.Invoke(Status.error);
         }
     }
-    public void enterInChat(){
+    public void EnterInChat(){
         try{
             Message mess = new Message{
                 typeMessage = messageType.getPrevInfo,
@@ -133,16 +128,14 @@ public class ChatEntiti {
                     UsersList.Add(name);
                 }
 
-                var reverseArr = Reverse<DBMessage>(prevInfo.messages!);
-
-                foreach(DBMessage name in prevInfo.messages!){
+                foreach(DBMessage name in Reverse(prevInfo.messages!)){
                     MessagesList.Add(name);
                 }
 
-                onOpenChat?.Invoke(Status.succes);
+                onEnterInChat?.Invoke(Status.succes);
             });
         }catch{
-            onOpenChat?.Invoke(Status.error);
+            onEnterInChat?.Invoke(Status.error);
         }
     }
 
@@ -168,11 +161,10 @@ public class ChatEntiti {
         DBMessage dbMessage = JsonSerializer.Deserialize<DBMessage>(data)!;
         MessagesList.Add(dbMessage);
         onNewMessage?.Invoke(dbMessage);
-        onChangeMessagesList?.Invoke();
     }
     void openChatHandler(string data){
         UsersList.Add(data);
-        onUserLeaveFromChat?.Invoke(data);
+        onUserEnterInChat?.Invoke(data);
 
         DBMessage dbMessage = new DBMessage{
             id = -100,
@@ -183,8 +175,6 @@ public class ChatEntiti {
 
         MessagesList.Add(dbMessage);
         onNewMessage?.Invoke(dbMessage);
-        onUserEnterInChat?.Invoke(data);
-        onChangeUsersList?.Invoke();
     }
     void leaveFromChatHandler(string data){
         UsersList.Remove(data);
@@ -199,8 +189,6 @@ public class ChatEntiti {
 
         MessagesList.Add(dbMessage);
         onNewMessage?.Invoke(dbMessage);
-        onUserLeaveFromChat.Invoke(data);
-        onChangeUsersList?.Invoke();
     }
 
 
@@ -214,7 +202,6 @@ public class ChatEntiti {
 
         netClient!.sendMessage(json);
     }
-
 
     void closeHandler(){
         onCloseConnection?.Invoke();

@@ -1,38 +1,28 @@
-﻿using static ChatEntiti;
+﻿using static AsyncLib;
+var d =  dontCloseProcces();
 
 
+ChatEntiti chatClient = new ChatEntiti();
 
-// using MyTypes;
-// using static AsyncLib;
+chatClient.onTryConnect += (status)=>{
+    Console.WriteLine(status);
+    chatClient.Auth("Senails","rtyrfvrty");
+};
 
-// var dontClose = dontCloseProcces();
+chatClient.onTryAuth += (status)=>{
+    Console.WriteLine(status);
+    chatClient.EnterInChat();
+};
 
+chatClient.onEnterInChat += (status)=>{
+    Console.WriteLine(status);
+    chatClient.sendMessage("пишу сообщение в чатик");
+};
 
-// ChatEntiti client = new ChatEntiti();
+chatClient.onNewMessage += (message)=>{
+    Console.WriteLine(message);
+};
 
-// client.onTryConnect += (Status status)=>{
-//     if (status==Status.succes){
-//         Console.WriteLine("соеденение установлено");
+chatClient.Connect("localhost",4000);
 
-//         client.onTryAuth += (Status status)=>{
-//             if (status==Status.succes){
-//                 Console.WriteLine("авторизация произошла");
-//             }else{
-//                 Console.WriteLine("авторизация не произошла");
-//             }
-//         };
-
-//         client.Auth("Senails","rtyrfvrty");
-//     }else{
-//         Console.WriteLine("ошибка при подключени");
-//     }
-// };
-
-// client.Connect("localhost",4000);
-
-
-
-
-
-
-// await dontClose.closeTask;
+await d.closeTask;
