@@ -4,16 +4,30 @@ using UnityEngine;
 
 public class ChatMessager : MonoBehaviour
 {
-    ChatEntiti chat;
-    private void Start() {
-        chat = new ChatEntiti();
+    ChatEntiti chatClient;
+    public void Start() {
+        chatClient = new ChatEntiti();
 
-        chat.onTryConnect+= (status)=>{
+        chatClient.onTryConnect += (status)=>{
             Debug.Log(status);
+            chatClient.Auth("Senails","rtyrfvrty");
         };
 
+        chatClient.onTryAuth += (status)=>{
+            Debug.Log(status);
+            chatClient.EnterInChat();
+        };
 
-        chat.Connect("localhost",4000);
+        chatClient.onEnterInChat += (status)=>{
+            Debug.Log(status);
+            chatClient.sendMessage("пишу сообщение в чатик");
+        };
+
+        chatClient.onNewMessage += (message)=>{
+            Debug.Log(message.text);
+        };
+
+        chatClient.Connect("localhost",4000);
     }
 
 }

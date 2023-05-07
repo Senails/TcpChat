@@ -1,8 +1,8 @@
 using System;
-using System.Collections;
+using UnityEngine;
 using System.Collections.Generic;
 
-using Json;
+using System.Text.Json;
 using static NeedMetods;
 
 using DBTypes;
@@ -45,7 +45,7 @@ public class ChatEntiti {
             typeMessage = messageType.getKeyRequest
         };
 
-        string text = JsonSerializer.Serialize(message);
+        string text = JsonSerializer.Serialize<Message>(message);
 
         netClient!.sendRequest(text,(string res)=>{
             Message message = JsonSerializer.Deserialize<Message>(res)!;
@@ -66,7 +66,6 @@ public class ChatEntiti {
                 typeMessage = messageType.authMeRequest,
                 data = datatext
             };
-
             string text = JsonSerializer.Serialize<Message>(message);
 
             netClient!.sendRequest(text,(string res)=>{

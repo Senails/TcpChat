@@ -87,47 +87,37 @@ public class MyTcpClient
         realSocket.Close();
         onClose?.Invoke();
     }
-    public void connect(string url, int port){
-        AsyncAction action = async ()=>{
-            await this.realSocket.ConnectAsync(url, port);
-            onConnect?.Invoke();
-        };
+    public async void connect(string url, int port){
+        await this.realSocket.ConnectAsync(url, port);
+        onConnect?.Invoke();
 
-        action().Wait();
-        waitMessages();
+        Thread newTread = new Thread(()=>{
+            waitMessages();
+        });
+        newTread.Start();
     }
-    async void waitMessages(){
+    void waitMessages(){
         while(true){
             byte[] bufferLenght = new byte[4];
             int count=1000;
             int size = 0;
 
+            byte[] bufferData = new byte[0];
             try{
-                count = await realSocket.ReceiveAsync(bufferLenght);
+                count = realSocket.Receive(bufferLenght);
                 size = BitConverter.ToInt32(bufferLenght, 0);
+
+                bufferData = new byte[size];
+                count = realSocket.Receive(bufferData);
             }catch{
                 internalClose();
                 break;
             }
+
             if (count == 0) {
                 internalClose();
                 break;
             } 
-
-            byte[] bufferData = new byte[size];
-
-            try{
-                count = await realSocket.ReceiveAsync(bufferData);
-            }catch{
-                internalClose();
-                break;
-            }
-
-            if (count == 0) {
-                internalClose();
-                break;
-            }
-            
             onGetFromServer(bufferData);  
         }
     }

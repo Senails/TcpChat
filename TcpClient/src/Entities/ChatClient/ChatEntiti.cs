@@ -45,6 +45,8 @@ public class ChatEntiti {
             Message message = JsonSerializer.Deserialize<Message>(res)!;
             openkey = JsonSerializer.Deserialize<KeyRSA>(message.data!)!;
             onTryConnect?.Invoke(Status.succes);
+
+            Console.WriteLine(res);
         });
     }
     public void Auth(string login ,string password){

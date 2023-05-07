@@ -88,7 +88,9 @@ public class ChatConnection{
         if (this.openRSAkey==null || this.secretRSAkey==null){
             createKeys(out this.openRSAkey,out this.secretRSAkey);
         }
-        return JsonSerializer.Serialize<KeyRSA>(this.openRSAkey);
+
+        string key = JsonSerializer.Serialize<KeyRSA>(this.openRSAkey);
+        return key;
     }
     async Task<string> authMeRequest(string data){
         try{

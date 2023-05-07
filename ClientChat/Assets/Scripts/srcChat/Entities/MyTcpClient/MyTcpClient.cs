@@ -1,14 +1,17 @@
 using System;
+using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using UnityEngine;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 using static MyDateLib;
 
-public class MyTcpClient 
+public class MyTcpClient
 {
     Socket realSocket;
     public event Action<string> onMessage;
@@ -91,14 +94,14 @@ public class MyTcpClient
         realSocket.Close();
         onClose.Invoke();
     }
-    public void connect(string url, int port){
-        AsyncAction action = async ()=>{
-            await this.realSocket.ConnectAsync(url, port);
-            onConnect.Invoke();
-        };
+    public async void connect(string url, int port){
+        await this.realSocket.ConnectAsync(url, port);
+        onConnect?.Invoke();
 
-        action().Wait();
-        waitMessages();
+        Thread newTread = new Thread(()=>{
+            waitMessages();
+        });
+        newTread.Start();
     }
     void waitMessages(){
         while(true){
@@ -106,21 +109,22 @@ public class MyTcpClient
             int count=1000;
             int size = 0;
 
-            byte[] bufferData = new byte[size];
+            byte[] bufferData;
             try{
                 count = realSocket.Receive(bufferLenght);
                 size = BitConverter.ToInt32(bufferLenght, 0);
 
+                bufferData = new byte[size];
                 count = realSocket.Receive(bufferData);
             }catch{
                 internalClose();
                 break;
             }
+
             if (count == 0) {
                 internalClose();
                 break;
             } 
-            
             onGetFromServer(bufferData);  
         }
     }

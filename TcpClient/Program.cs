@@ -20,7 +20,7 @@ chatClient.onEnterInChat += (status)=>{
 };
 
 chatClient.onNewMessage += (message)=>{
-    Console.WriteLine(message);
+    Console.WriteLine(message.text);
 };
 
 chatClient.Connect("localhost",4000);
