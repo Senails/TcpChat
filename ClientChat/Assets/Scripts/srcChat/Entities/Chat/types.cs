@@ -40,7 +40,6 @@ namespace MyTypes{
     }
 
 
-
     public enum Status{
         succes,
         error,

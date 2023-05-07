@@ -21,6 +21,7 @@ public static class MyRSAcoder
         secretKey = new KeyRSA() { num = d, mod = n};
     }
 
+
     public static string encodeText(string text , long key , long mod){
         byte[] bufferMessage = Encoding.UTF8.GetBytes(text);
         string res = "";
