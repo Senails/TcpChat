@@ -6,6 +6,9 @@
 [Bb]uild[0-9]
 
 
+ClientChat/
+
+
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/

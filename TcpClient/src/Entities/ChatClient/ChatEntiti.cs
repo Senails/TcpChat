@@ -12,7 +12,7 @@ public class ChatEntiti {
     public List<DBMessage> MessagesList = new List<DBMessage>();
     public event Action<Status>? onTryConnect;
     public event Action<Status>? onTryAuth;
-    public event Action<Status>? onOpenChat;
+    public event Action<Status>? onEnterInChat;
 
     public event Action<DBMessage>? onNewMessage;
     public event Action<string>? onUserEnterInChat;
@@ -34,7 +34,7 @@ public class ChatEntiti {
             onTryConnect?.Invoke(Status.error);
         }
     }
-    public void getKeyFromServer(){
+    void getKeyFromServer(){
         Message message = new Message{
             typeMessage = messageType.getKeyRequest
         };
@@ -104,7 +104,7 @@ public class ChatEntiti {
             onTryAuth?.Invoke(Status.error);
         }
     }
-    public void enterInChat(){
+    public void EnterInChat(){
         try{
             Message mess = new Message{
                 typeMessage = messageType.getPrevInfo,
@@ -126,10 +126,10 @@ public class ChatEntiti {
                     MessagesList.Add(name);
                 }
 
-                onOpenChat?.Invoke(Status.succes);
+                onEnterInChat?.Invoke(Status.succes);
             });
         }catch{
-            onOpenChat?.Invoke(Status.error);
+            onEnterInChat?.Invoke(Status.error);
         }
     }
 

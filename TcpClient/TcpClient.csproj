@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt-Official" Version="0.1.109" />
+    <PackageReference Include="MongoDB.Bson" Version="2.19.1" />
   </ItemGroup>
 
 </Project>
