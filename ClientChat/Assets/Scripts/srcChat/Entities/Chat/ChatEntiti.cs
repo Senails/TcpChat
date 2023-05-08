@@ -4,20 +4,20 @@ using System.Collections.Generic;
 
 using System.Text.Json;
 using static NeedMetods;
+using System.Threading.Tasks;
 
 using DBTypes;
 using MyTypes;
 using static MyRSAcoder;
 
 public class ChatEntiti {
-    string userName = "";
+    public string userName = "";
     KeyRSA openkey = null;
     MyTcpClient netClient;
 
     public List<string> UsersList= new List<string>();
     public List<DBMessage> MessagesList = new List<DBMessage>();
     public event Action<Status> onTryConnect;
-    public event Action<Status> onTryAuth;
     public event Action<Status> onEnterInChat;
 
     public event Action<DBMessage> onNewMessage;
@@ -53,7 +53,9 @@ public class ChatEntiti {
             onTryConnect?.Invoke(Status.succes);
         });
     }
-    public void Auth(string login ,string password){
+    public async Task<bool> Auth(string login ,string password){
+        TaskCompletionSource<bool> result = new TaskCompletionSource<bool>();
+
         try{
             loginData dat  = new loginData{
                 login = login,
@@ -71,16 +73,20 @@ public class ChatEntiti {
             netClient!.sendRequest(text,(string res)=>{
                 Message message = JsonSerializer.Deserialize<Message>(res)!;
                 if (message.data=="ok"){
-                    onTryAuth?.Invoke(Status.succes);
+                    result.SetResult(true);
+                    userName = login;
                 }else{
-                    onTryAuth?.Invoke(Status.error);
+                    result.SetResult(false);
                 }
             });
         }catch{
-            onTryAuth?.Invoke(Status.error);
+            result.SetResult(false);
         }
+
+        return await result.Task;
     }
-    public void Register(string login ,string password){
+    public async Task<bool> Register(string login ,string password){
+        TaskCompletionSource<bool> result = new TaskCompletionSource<bool>();
         try{
             registerData dat  = new registerData{
                 login = login,
@@ -100,14 +106,16 @@ public class ChatEntiti {
             netClient!.sendRequest(text,(string res)=>{
                 Message message = JsonSerializer.Deserialize<Message>(res)!;
                 if (message.data=="ok"){
-                    onTryAuth?.Invoke(Status.succes);
+                    result.SetResult(true);
+                    userName = login;
                 }else{
-                    onTryAuth?.Invoke(Status.error);
+                    result.SetResult(false);
                 }
             });
         }catch{
-            onTryAuth?.Invoke(Status.error);
+            result.SetResult(false);
         }
+        return await result.Task;
     }
     public void EnterInChat(){
         try{
@@ -122,7 +130,6 @@ public class ChatEntiti {
                 if (mess==null) return;
                 PrevInfo prevInfo = JsonSerializer.Deserialize<PrevInfo>(mess.data!)!;
 
-                UsersList.Add(this.userName);
                 foreach(string name in prevInfo.userNames!){
                     UsersList.Add(name);
                 }
@@ -201,6 +208,10 @@ public class ChatEntiti {
 
         netClient!.sendMessage(json);
     }
+    public void Close(){
+        netClient.Close();
+    }
+
 
     void closeHandler(){
         onCloseConnection?.Invoke();

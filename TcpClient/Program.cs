@@ -6,7 +6,7 @@ ChatEntiti chatClient = new ChatEntiti();
 
 chatClient.onTryConnect += (status)=>{
     Console.WriteLine(status);
-    chatClient.Auth("Senails","rtyrfvrty");
+    chatClient.Auth("Sena1ils","rtyrfvr1ty");
 };
 
 chatClient.onTryAuth += (status)=>{
