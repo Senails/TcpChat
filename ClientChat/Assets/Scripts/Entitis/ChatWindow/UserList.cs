@@ -11,18 +11,13 @@ public class UserList : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ChatManager.Self.chatClient.onEnterInChat+=(s)=>{
+        ChatManager.Self.chatClient.onConnect+=()=>{
             UnityMainThread.wkr.AddJob(()=>{
                 RenderUsersNames();
             });
         };
 
-        ChatManager.Self.chatClient.onUserEnterInChat+=(s)=>{
-            UnityMainThread.wkr.AddJob(()=>{
-                RenderUsersNames();
-            });
-        };
-        ChatManager.Self.chatClient.onUserLeaveFromChat+=(s)=>{
+        ChatManager.Self.chatClient.onChangeUsersList+=()=>{
             UnityMainThread.wkr.AddJob(()=>{
                 RenderUsersNames();
             });

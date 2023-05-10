@@ -3,7 +3,7 @@ using System.Net;
 namespace TypesForUdp{
 
     public record Dgram {
-        public DgramInfoType? type { get; set; }
+        public DgramInfoType type { get; set; }
         public DgramMeanType? meanType { get; set; }
         public long? ID { get; set; }
         public byte[]? data { get; init; }

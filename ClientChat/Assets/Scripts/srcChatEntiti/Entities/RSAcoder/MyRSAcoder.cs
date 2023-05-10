@@ -1,28 +1,26 @@
 using System;
 using System.Text;
 using System.Numerics;
-using System.Collections;
 using System.Collections.Generic;
 
 public static class MyRSAcoder
 {   
-    public static void createKeys(out KeyRSA openKey, out KeyRSA secretKey){
-        long p = getSimpleNumber();
-        long q = getSimpleNumber();
+    public static void CreateKeys(out KeyRSA openKey, out KeyRSA secretKey){
+        long p = GetSimpleNumber();
+        long q = GetSimpleNumber();
 
-        while (p==q) q = getSimpleNumber();
+        while (p==q) q = GetSimpleNumber();
 
         long n = p*q;
         long m = (p-1)*(q-1);
-        long d = findNumberD(m);
-        long e = findNumberE(m ,d);
+        long d = FindNumberD(m);
+        long e = FindNumberE(m ,d);
 
         openKey = new KeyRSA() { num = e, mod = n};
         secretKey = new KeyRSA() { num = d, mod = n};
     }
 
-
-    public static string encodeText(string text , long key , long mod){
+    public static string EncodeText(string text , long key , long mod){
         byte[] bufferMessage = Encoding.UTF8.GetBytes(text);
         string res = "";
 
@@ -35,7 +33,7 @@ public static class MyRSAcoder
 
         return res;
     }
-    public static string decodeText(string text , long key , long mod){
+    public static string DecodeText(string text , long key , long mod){
         var list = new List<string>();
 
         string buf = "";
@@ -67,7 +65,7 @@ public static class MyRSAcoder
     }
 
 
-    static long findNumberE(long m,long d){
+    static long FindNumberE(long m,long d){
         long e = 1;
  
         while (true){
@@ -77,7 +75,7 @@ public static class MyRSAcoder
  
         return e;
     }
-    static long findNumberD(long m){
+    static long FindNumberD(long m){
         long d = m - 1;
 
         long i = 2;
@@ -94,13 +92,13 @@ public static class MyRSAcoder
     }
     
     
-    static long getSimpleNumber(){
+    static long GetSimpleNumber(){
         Random rand = new Random();
-        long randomNumber = (long)rand.Next(2,100);
+        long randomNumber = rand.Next(2,100);
 
         int i = 1; 
         while (true){
-            if (isSimple(randomNumber)) break;
+            if (IsSimple(randomNumber)) break;
             if (i%2==0){
                 randomNumber+=i;
             }else{
@@ -111,7 +109,7 @@ public static class MyRSAcoder
 
         return randomNumber;
     }
-    static bool isSimple(long num)
+    static bool IsSimple(long num)
     {
         if (num<2) return false;
         if (num==2) return true;

@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 
 namespace TypesForUdp{
@@ -6,13 +7,13 @@ namespace TypesForUdp{
         public DgramInfoType type { get; set; }
         public DgramMeanType? meanType { get; set; }
         public long ID { get; set; }
-        public byte[]? data { get; init; }
+        public byte[] data { get; init; }
     }
 
     public record DgramForList{
-        public EndPoint? endPoint { get; init; }
-        public Dgram? dgram { get; init; }
-        public byte[]? serializedDgram { get; init; }
+        public EndPoint endPoint { get; init; }
+        public Dgram dgram { get; init; }
+        public byte[] serializedDgram { get; init; }
     }
 
     public enum DgramInfoType{
@@ -29,6 +30,6 @@ namespace TypesForUdp{
 
     public record DgramWaiter {
         public long dgramID { get; init; }
-        public Action<byte[]>? handler { get; init; }
+        public Action<byte[]> handler { get; init; }
     }
 }

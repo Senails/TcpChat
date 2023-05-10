@@ -12,13 +12,12 @@ public class MessageArray : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ChatManager.Self.chatClient.onEnterInChat+=(s)=>{
+        ChatManager.Self.chatClient.onGetDataChat += ()=>{
             UnityMainThread.wkr.AddJob(()=>{
                 RenderMessages();
             });
         };
-
-        ChatManager.Self.chatClient.onNewMessage+=(s)=>{
+        ChatManager.Self.chatClient.onChangeMessagesList +=()=>{
             UnityMainThread.wkr.AddJob(()=>{
                 RenderMessages();
             });
@@ -32,6 +31,8 @@ public class MessageArray : MonoBehaviour
         List<DBTypes.DBMessage> list = ChatManager.Self.chatClient.MessagesList;
 
         foreach(var message in list){
+            Debug.Log(message);
+
             GameObject child;
             if (message.id<0){
                 child = Object.Instantiate(eventMessagePrefab,Content.transform);

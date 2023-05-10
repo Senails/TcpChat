@@ -1,6 +1,5 @@
 using System;
 
-
 static class MyDateLib {
     static public long getDateMilisec(){
         DateTime date1 = DateTime.Now;

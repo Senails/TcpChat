@@ -1,10 +1,10 @@
 using DBTypes;
 
-namespace MyTypes{
+namespace ChatTypes{
     
     public record Message{
         public messageType typeMessage { get; init; }
-        public string data { get; init; }
+        public byte[] data { get; init; }
     }
 
     public enum messageType{
@@ -28,20 +28,14 @@ namespace MyTypes{
         public DBMessage[] messages { get; init; }
     }
 
-    public record loginData{
+    public record LoginData{
         public string login { get; init; }
-        public string criptedPassword { get; init; }
+        public string criptPass { get; init; }
     }
 
-    public record registerData{
+    public record RegisterData{
         public string name { get; init; }
         public string login { get; init; }
-        public string criptedPassword { get; init; }
-    }
-
-
-    public enum Status{
-        succes,
-        error,
+        public string criptPass { get; init; }
     }
 }
