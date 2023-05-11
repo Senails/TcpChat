@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Net;
 using UnityEngine;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
-using MyTypes;
 
 public class ChatManager : MonoBehaviour
 {
@@ -13,23 +13,23 @@ public class ChatManager : MonoBehaviour
     public GameObject ChatWindow;
 
 
-    bool isConnect;
-    public ChatEntiti chatClient;
+    private bool _isConnect;
+
+
+    public ChatClient chatClient;
     public static ChatManager Self;
 
     public void Awake() {
+        EndPoint endpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4000);
         Self=this;
-        Connect("localhost",4000);
+        Connect(endpoint);
     }
 
-    void Connect(string adress,int port){
-        chatClient = new ChatEntiti();
-        chatClient.onTryConnect += (status)=>{
-            if (status==Status.succes){
-                showLoginWindow(true);
-            }else{
-                showErrorWindow(true);
-            }
+
+    private void Connect(EndPoint serverEndPoint){
+        chatClient = new ChatClient();
+        chatClient.onConnect += ()=>{
+            showLoginWindow(true);
         };
         chatClient.onCloseConnection += ()=>{
             showErrorWindow(true);
@@ -37,24 +37,31 @@ public class ChatManager : MonoBehaviour
             showChatWindow(false);
         };
 
-        chatClient.Connect(adress,port);
+        chatClient.Connect(serverEndPoint);
     }
-    void showLoginWindow(bool show){
+    private void showLoginWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
             LoginWindow.SetActive(show);
         });
     }
-    void showErrorWindow(bool show){
+    private void showErrorWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
             ErrorWindow.SetActive(show);
         });
     }
-    void showChatWindow(bool show){
+    private void showChatWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
             ChatWindow.SetActive(show);
         });
     }
 
+
+    private void onAuth(){
+        chatClient.onGetDataChat += ()=>{
+            showLoginWindow(false);
+        };
+        chatClient.GetDataForChat();
+    }
 
 
     public async Task<bool> registration(string login,string password){
@@ -67,25 +74,23 @@ public class ChatManager : MonoBehaviour
         if (res) onAuth();
         return res;
     }
-    
-    
-    void onAuth(){
-        showLoginWindow(false);
-        showChatWindow(true);
-        chatClient.EnterInChat();
-    }
-
-
     public void SendMessageInChat(string text){
-        chatClient.sendMessage(text);
+        chatClient.SendMessage(text);
     }
     
+
     public void reconnection(){
-        Debug.Log("Я я переподключаюсь");
+        if (chatClient!=null) chatClient.Close();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("Я переподключаюсь");
     }
     public void Close(){
         if (chatClient!=null) chatClient.Close();
         Application.Quit();
     }
+}
 
+namespace System.Runtime.CompilerServices
+{
+        internal static class IsExternalInit {}
 }
