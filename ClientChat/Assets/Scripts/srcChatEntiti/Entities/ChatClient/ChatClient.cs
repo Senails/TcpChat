@@ -17,9 +17,10 @@ using static NeedMetods;
 public class ChatClient{
     private KeyRSA _openkey = null;
     private UdpClient _udpClient;
-
-
     private object _lockerLists = new{};
+
+
+    public string UsersName;
     public List<string> UsersList= new List<string>();
     public List<DBMessage> MessagesList = new List<DBMessage>();
 
@@ -56,6 +57,7 @@ public class ChatClient{
         });
     }
     public async Task<bool> Auth(string login ,string password){
+        this.UsersName=login;
         TaskCompletionSource<bool> endEmiter = new TaskCompletionSource<bool>();
         LoginData dat  = new LoginData{
             login = login,
@@ -76,6 +78,7 @@ public class ChatClient{
         return await endEmiter.Task;
     }
     public async Task<bool> Register(string login ,string password){
+        this.UsersName=login;
         TaskCompletionSource<bool> endEmiter = new TaskCompletionSource<bool>();
         RegisterData dat  = new RegisterData{
             login = login,
