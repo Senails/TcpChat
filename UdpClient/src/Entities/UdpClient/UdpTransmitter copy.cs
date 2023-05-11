@@ -1,11 +1,4 @@
-using UnityEngine;
-
-using System;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-
-using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
@@ -20,8 +13,8 @@ class UdpTransmitter{
     private List<DgramForList> _listForConfirmation = new List<DgramForList>();
 
 
-    public event Action onClose;
-    public event Action<Dgram,EndPoint> onGetDgram;
+    public event Action? onClose;
+    public event Action<Dgram,EndPoint>? onGetDgram;
 
 
     public UdpTransmitter(){
@@ -60,13 +53,14 @@ class UdpTransmitter{
     }
     private void RemoveDgramFromSendingList(long dgramID,EndPoint endpoint){
         lock(_lockerSendingList){
-            DgramForList dgrmForList = _listForSend.Find((elem)=>
+            DgramForList? dgrmForList = _listForSend.Find((elem)=>
             elem.dgram!.ID == dgramID && 
             elem.endPoint!.Equals(endpoint));
 
             if (dgrmForList!=null) _listForSend.Remove(dgrmForList);
         }
     }
+
 
 
     private void AddDgramToConfirmationList(Dgram dgrama,EndPoint endpoint){
@@ -77,13 +71,17 @@ class UdpTransmitter{
         _listForConfirmation.Add(dgrmForList);
     }
     private bool CheckDgramInConfirmationList(Dgram dgrama,EndPoint endpoint){
-        DgramForList dgrmForList = _listForConfirmation.Find((elem)=>
-        elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint));
+        DgramForList? dgrmForList = _listForConfirmation
+        .Find((elem)=>{
+            if (elem==null) return false;
+            return elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint);
+        });
         return (dgrmForList!=null);
     }
     private void RemoveDgramFromConfirmationList(Dgram dgrama,EndPoint endpoint){
-        DgramForList dgrmForList = _listForConfirmation.Find((elem)=>
-        elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint));
+        DgramForList? dgrmForList = _listForConfirmation.Find((elem)=>{
+            return elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint);
+        });
         if (dgrmForList!=null) _listForConfirmation.Remove(dgrmForList);
     }
     private void SendConfirmationDgram(Dgram dgrama,EndPoint endpoint){
@@ -135,12 +133,7 @@ class UdpTransmitter{
 
     public void Listen(EndPoint listenEndPoint){
         _socket.onGetDgram+=(byte[] bytes,EndPoint endpoint)=>{
-            Dgram dgrama = null;
-            try{
-                dgrama = BsonSerializer.Deserialize<Dgram>(bytes);
-            }catch{
-                Debug.Log("ошибка при десириализации");
-            }
+            Dgram dgrama = BsonSerializer.Deserialize<Dgram>(bytes);
             WorkOnDgram(dgrama,endpoint);
         };
         _socket.onClose += ()=>{
