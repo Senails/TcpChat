@@ -90,9 +90,10 @@ class UdpClient{
         }
         if (dgrm.meanType == DgramMeanType.responseMessage){
             lock(_lockerWaiterList){
-                DgramWaiter? waiter = FindWaiterInList(dgrm);
-                waiter?.handler!(dgrm.data!);
-                if (waiter!=null) _dgramWaiterList.Remove(waiter);
+                DgramWaiter waiter = FindWaiterInList(dgrm);
+                if (waiter==null) return;
+                waiter.handler!(dgrm.data!);
+                _dgramWaiterList.Remove(waiter);
             }
             return;
         }

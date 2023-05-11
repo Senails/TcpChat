@@ -71,13 +71,22 @@ class UdpTransmitter{
         _listForConfirmation.Add(dgrmForList);
     }
     private bool CheckDgramInConfirmationList(Dgram dgrama,EndPoint endpoint){
-        DgramForList? dgrmForList = _listForConfirmation.Find((elem)=>
-        elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint));
+        DgramForList? dgrmForList = _listForConfirmation.Find((elem)=>{
+
+            if (dgrama.ID==null || endpoint==null) Console.WriteLine("bag");
+            
+            return elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint);
+        });
         return (dgrmForList!=null);
     }
     private void RemoveDgramFromConfirmationList(Dgram dgrama,EndPoint endpoint){
-        DgramForList? dgrmForList = _listForConfirmation.Find((elem)=>
-        elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint));
+        DgramForList? dgrmForList = _listForConfirmation.Find((elem)=>{
+
+            if (dgrama.ID==null || endpoint==null) Console.WriteLine("bag");
+
+            
+            return elem.dgram!.ID == dgrama.ID && elem.endPoint!.Equals(endpoint);
+        });
         if (dgrmForList!=null) _listForConfirmation.Remove(dgrmForList);
     }
     private void SendConfirmationDgram(Dgram dgrama,EndPoint endpoint){

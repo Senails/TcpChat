@@ -141,7 +141,7 @@ class ChatClient{
             id = -100,
             date = 0,
             authtor = "",
-            text = $"{data} вошел в чатик"
+            text = $"{name} вошел в чатик"
         };
 
         MessagesList.Add(dbMessage);
@@ -156,7 +156,7 @@ class ChatClient{
             id = -100,
             date = 0,
             authtor = "",
-            text = $"{data} вышел из чатика"
+            text = $"{name} вышел из чатика"
         };
 
         MessagesList.Add(dbMessage);

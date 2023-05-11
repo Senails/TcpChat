@@ -7,6 +7,7 @@ using ChatTypes;
 
 using static MyDateLib;
 using static MyRSAcoder;
+using static AsyncLib;
 
 class ChatConnection{
     public bool IsAuth = false;
@@ -77,8 +78,10 @@ class ChatConnection{
         if (obj.typeMessage != messageType.getPrevInfo) return;
         if (response.Length==0) return;
 
-        IsOpen=true;
-        OpenHandler();
+        setTimeout(()=>{
+            IsOpen=true;
+            OpenHandler();
+        },5);
     }
 
 
@@ -194,6 +197,8 @@ class ChatConnection{
     }
     public void SendMessage(Message message){
         if (_connection==null) return;
-        _connection.SendMessage(message.ToBson());
+        setTimeout(()=>{
+            _connection.SendMessage(message.ToBson());
+        },200);
     }
 }

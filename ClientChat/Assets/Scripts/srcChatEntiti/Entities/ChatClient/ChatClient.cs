@@ -19,6 +19,7 @@ public class ChatClient{
     private UdpClient _udpClient;
 
 
+    private object _lockerLists = new{};
     public List<string> UsersList= new List<string>();
     public List<DBMessage> MessagesList = new List<DBMessage>();
 
@@ -111,7 +112,9 @@ public class ChatClient{
                 MessagesList.Add(name);
             }
 
-            onGetDataChat?.Invoke();
+            lock(_lockerLists){
+                onGetDataChat?.Invoke();
+            }
         });
     }
 
@@ -135,38 +138,49 @@ public class ChatClient{
     }
     private void NewMessageHandler(byte[] data){
         DBMessage dbMessage = BsonSerializer.Deserialize<DBMessage>(data)!;
-        MessagesList.Add(dbMessage);
-        onChangeMessagesList?.Invoke();
+        lock(_lockerLists){
+            MessagesList.Add(dbMessage);
+            onChangeMessagesList?.Invoke();
+        }
     }
     private void UserEnterInChatHandler(byte[] data){
         string name = Encoding.UTF8.GetString(data);
-        UsersList.Add(name);
-        onChangeUsersList?.Invoke();
+
+        lock(_lockerLists){
+            UsersList.Add(name);
+            onChangeUsersList?.Invoke();
+        }
+
+        DBMessage dbMessage = new DBMessage{
+            id = -100,
+            date = 0,
+            authtor = "",
+            text = $"{name} вошел в чатик"
+        };
+
+        lock(_lockerLists){
+            MessagesList.Add(dbMessage);
+            onChangeMessagesList?.Invoke();
+        }
+    }
+    private void UserLeaveFromChatHandler(byte[] data){
+        string name = Encoding.UTF8.GetString(data);
+        lock(_lockerLists){
+            UsersList.Remove(name);
+            onChangeUsersList?.Invoke();
+        }
         
         DBMessage dbMessage = new DBMessage{
             id = -100,
             date = 0,
             authtor = "",
-            text = $"{data} вошел в чатик"
+            text = $"{name} вышел из чатика"
         };
 
-        MessagesList.Add(dbMessage);
-        onChangeMessagesList?.Invoke();
-    }
-    private void UserLeaveFromChatHandler(byte[] data){
-        string name = Encoding.UTF8.GetString(data);
-        UsersList.Remove(name);
-        onChangeUsersList?.Invoke();
-
-        DBMessage dbMessage = new DBMessage{
-            id = -100,
-            date = 0,
-            authtor = "",
-            text = $"{data} вышел из чатика"
-        };
-
-        MessagesList.Add(dbMessage);
-        onChangeMessagesList?.Invoke();
+        lock(_lockerLists){
+            MessagesList.Add(dbMessage);
+            onChangeMessagesList?.Invoke();
+        }
     }
     private void CloseHandler(){
         onCloseConnection?.Invoke();

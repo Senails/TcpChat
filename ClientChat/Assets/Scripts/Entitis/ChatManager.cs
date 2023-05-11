@@ -1,9 +1,10 @@
+using System;
 using System.Net;
 using UnityEngine;
+using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
-
-using ChatTypes;
 
 public class ChatManager : MonoBehaviour
 {
@@ -57,9 +58,7 @@ public class ChatManager : MonoBehaviour
 
     private void onAuth(){
         chatClient.onGetDataChat += ()=>{
-            Debug.Log("onGetDataChat");
             showLoginWindow(false);
-            showChatWindow(true);
         };
         chatClient.GetDataForChat();
     }
@@ -81,7 +80,9 @@ public class ChatManager : MonoBehaviour
     
 
     public void reconnection(){
-        Debug.Log("Я я переподключаюсь");
+        if (chatClient!=null) chatClient.Close();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("Я переподключаюсь");
     }
     public void Close(){
         if (chatClient!=null) chatClient.Close();
