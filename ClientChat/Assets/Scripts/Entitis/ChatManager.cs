@@ -41,16 +41,19 @@ public class ChatManager : MonoBehaviour
     }
     private void showLoginWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
+            if (LoginWindow!=null)
             LoginWindow.SetActive(show);
         });
     }
     private void showErrorWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
+            if (LoginWindow!=null)
             ErrorWindow.SetActive(show);
         });
     }
     private void showChatWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
+            if (LoginWindow!=null)
             ChatWindow.SetActive(show);
         });
     }

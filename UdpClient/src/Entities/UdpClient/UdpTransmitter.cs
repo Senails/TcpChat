@@ -38,7 +38,7 @@ class UdpTransmitter{
     private void AddDgramToSendingList(Dgram dgram,EndPoint endpoint){
         DgramForList dgrmForList = new DgramForList{
             dgram = dgram,
-            serializedDgram = dgram.ToBson(),
+            serializedDgram = SerializeDgramToBytes(dgram),
             endPoint = endpoint,
         };
 
@@ -87,10 +87,11 @@ class UdpTransmitter{
     private void SendConfirmationDgram(Dgram dgrama,EndPoint endpoint){
         Dgram myDgram = new Dgram{
             type = DgramInfoType.ConfirmationTransport,
+            meanType = DgramMeanType.simpleMessage,
             ID = dgrama.ID,
         };
 
-        _socket.SendDramm(myDgram.ToBson(),endpoint);
+        _socket.SendDramm(SerializeDgramToBytes(myDgram),endpoint);
     }
 
 
@@ -131,9 +132,32 @@ class UdpTransmitter{
     }
 
 
+    private byte[] SerializeDgramToBytes(Dgram dgrama){
+        byte[] dgramTypes = new byte[2] {
+            (byte)dgrama.type,
+            (byte)dgrama.meanType!
+        };
+        byte[] dgramID = BitConverter.GetBytes((long)dgrama.ID!);
+
+        var a = dgramTypes.Concat(dgramID);
+        if (dgrama.data!=null) a = a.Concat(dgrama.data);
+        return a.ToArray();
+    }
+    private Dgram DeserializeDgramFromBytes(byte[] bytes){
+        ArraySegment<byte> dataSegment = new ArraySegment<byte>(bytes, 10, (bytes.Length-10));
+
+        Dgram dgrama = new Dgram{
+            type = (DgramInfoType)bytes[0],
+            meanType = (DgramMeanType)bytes[1],
+            ID = BitConverter.ToInt64(bytes,2),
+            data = dataSegment.ToArray(),
+        };
+        return dgrama;
+    }
+
     public void Listen(EndPoint listenEndPoint){
         _socket.onGetDgram+=(byte[] bytes,EndPoint endpoint)=>{
-            Dgram dgrama = BsonSerializer.Deserialize<Dgram>(bytes);
+            Dgram dgrama = DeserializeDgramFromBytes(bytes);
             WorkOnDgram(dgrama,endpoint);
         };
         _socket.onClose += ()=>{
