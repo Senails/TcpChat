@@ -1,7 +1,5 @@
-using System;
 using System.Net;
 using UnityEngine;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
@@ -11,33 +9,52 @@ public class ChatManager : MonoBehaviour
     public GameObject LoginWindow;
     public GameObject ErrorWindow;
     public GameObject ChatWindow;
+    public GameObject SelectIpWindow;
 
 
-    private bool _isConnect;
+    public bool IsConnect = false;
 
 
     public ChatClient chatClient;
     public static ChatManager Self;
 
     public void Awake() {
-        EndPoint endpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4000);
         Self=this;
-        Connect(endpoint);
     }
 
 
-    private void Connect(EndPoint serverEndPoint){
-        chatClient = new ChatClient();
-        chatClient.onConnect += ()=>{
-            showLoginWindow(true);
-        };
-        chatClient.onCloseConnection += ()=>{
-            showErrorWindow(true);
-            showLoginWindow(false);
-            showChatWindow(false);
-        };
+    public void Connect(string ip){
+        try{
+            EndPoint endpoint = new IPEndPoint(IPAddress.Parse(ip), 6000);
 
-        chatClient.Connect(serverEndPoint);
+            chatClient = new ChatClient();
+            chatClient.onConnect += ()=>{
+                showSelectIpWindow(false);
+                showLoginWindow(true);
+                showChatWindow(true);
+            };
+            chatClient.onCloseConnection += ()=>{
+                showErrorWindow(true);
+            };
+
+            chatClient.Connect(endpoint);
+        }catch{
+            showErrorWindow(true);
+        }
+    }
+
+
+    private void showChatWindow(bool show){
+        UnityMainThread.wkr.AddJob(()=>{
+            if (LoginWindow!=null)
+            ChatWindow.SetActive(show);
+        });
+    }
+    private void showSelectIpWindow(bool show){
+        UnityMainThread.wkr.AddJob(()=>{
+            if (LoginWindow!=null)
+            SelectIpWindow.SetActive(show);
+        });
     }
     private void showLoginWindow(bool show){
         UnityMainThread.wkr.AddJob(()=>{
@@ -51,12 +68,7 @@ public class ChatManager : MonoBehaviour
             ErrorWindow.SetActive(show);
         });
     }
-    private void showChatWindow(bool show){
-        UnityMainThread.wkr.AddJob(()=>{
-            if (LoginWindow!=null)
-            ChatWindow.SetActive(show);
-        });
-    }
+
 
 
     private void onAuth(){
@@ -95,5 +107,5 @@ public class ChatManager : MonoBehaviour
 
 namespace System.Runtime.CompilerServices
 {
-        internal static class IsExternalInit {}
+    internal static class IsExternalInit {}
 }
