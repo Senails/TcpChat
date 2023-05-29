@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
@@ -11,8 +8,8 @@ public class LoginWindow : MonoBehaviour
     public TMP_Text tmp;
     public GameObject loginInputObj;
     public GameObject passwordInputObj;
-    TMP_InputField loginInput;
-    TMP_InputField passwordInput;
+    public TMP_InputField loginInput;
+    public TMP_InputField passwordInput;
 
     bool sendingData = false;
 
