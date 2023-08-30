@@ -1,7 +1,7 @@
 ## My Udp Chat with client on Unity ##   
 ### Мой Udp чат с клиентом на Unity ###  
 
-### Инструкция для релиза: ###  
+### Инструкция для релиза: ###    
 
 1. - Распаковать ServerBuild.zip  
    - открыть папку ServerBuild  
