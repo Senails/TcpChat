@@ -1,4 +1,4 @@
-## My Udp Chat with client on Unity ##   
+## My Udp Chat with client on Unity ##
 ### Мой Udp чат с клиентом на Unity ###  
 
 ### Инструкция для релиза: ###    
